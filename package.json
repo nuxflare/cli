@@ -1,0 +1,34 @@
+{
+  "name": "nuxflare",
+  "version": "0.1.0",
+  "description": "Deploy your Nuxt app to Cloudflare.",
+  "main": "dist/index.js",
+  "bin": {
+    "nuxflare": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc && mkdir -p dist/templates && cp src/templates/* dist/templates/",
+    "dev": "tsc -w",
+    "prepare": "npm run build"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "dotenv": "^16.4.7",
+    "fs-extra": "^11.2.0",
+    "inquirer": "^8.2.6"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/inquirer": "^8.2.10",
+    "@types/node": "^20.10.5",
+    "typescript": "^5.3.3"
+  },
+  "keywords": [],
+  "author": "Tanay Karnik",
+  "license": "MIT",
+  "files": [
+    "dist/**/*",
+    "dist/templates/*"
+  ]
+}
