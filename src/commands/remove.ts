@@ -12,12 +12,12 @@ export async function remove() {
     packageManager === "npm"
       ? "npx"
       : packageManager === "yarn"
-        ? "yarn"
-        : packageManager === "pnpm"
-          ? "pnpm"
-          : packageManager === "bun"
-            ? "bunx"
-            : "npx";
+      ? "yarn"
+      : packageManager === "pnpm"
+      ? "pnpm"
+      : packageManager === "bun"
+      ? "bunx"
+      : "npx";
 
   const removeProcess = spawn(command, ["sst", "remove", ...args], {
     stdio: "inherit",

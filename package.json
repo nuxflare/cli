@@ -1,6 +1,6 @@
 {
   "name": "nuxflare",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Deploy your Nuxt app to Cloudflare.",
   "main": "dist/index.js",
   "bin": {

@@ -41,6 +41,7 @@ npx nuxflare init
 ```
 
 During initialization:
+
 - Choose your project name
 - Select your preferred package manager
 - Nuxflare will create a `sst.config.ts` file for deploying resources
@@ -62,6 +63,7 @@ npx nuxflare copy-env --stage dev
 ```
 
 This command will:
+
 1. Read your local `.env` file
 2. Show a preview of the variables to be copied
 3. Set the environment variables for your specified stage
