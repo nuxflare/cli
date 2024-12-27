@@ -10,7 +10,7 @@ export async function remove() {
 
   const packageManager = await getPackageManager();
   const command = getExecutableCommand(packageManager);
-  const args = ["remove", ...process.argv.slice(3)];
+  const args = ["sst", "remove", ...process.argv.slice(3)];
 
   const removeProcess = spawn(command, args, {
     stdio: "inherit",

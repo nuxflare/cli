@@ -41,7 +41,7 @@ export async function copyEnv(options: CopyEnvOptions) {
 
     // Update SST secrets
     execSync(
-      `${command} secret set Env '${JSON.stringify(envVars)}' --stage ${
+      `${command} sst secret set Env '${JSON.stringify(envVars)}' --stage ${
         options.stage
       }`,
       {

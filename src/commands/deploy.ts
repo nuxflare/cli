@@ -10,7 +10,7 @@ export async function deploy() {
 
   const packageManager = await getPackageManager();
   const command = getExecutableCommand(packageManager);
-  const args = ["deploy", ...process.argv.slice(3)];
+  const args = ["sst", "deploy", ...process.argv.slice(3)];
 
   const deployProcess = spawn(command, args, {
     stdio: "inherit",
