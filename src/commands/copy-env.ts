@@ -2,7 +2,7 @@ import { readFileSync } from "fs";
 import { parse } from "dotenv";
 import { execSync } from "child_process";
 import inquirer from "inquirer";
-import { getPackageManager } from "../utils/package-manager";
+import { getExecutableCommand } from "../utils/package-manager";
 
 interface CopyEnvOptions {
   stage: string;
@@ -33,21 +33,11 @@ export async function copyEnv(options: CopyEnvOptions) {
       return;
     }
 
-    const packageManager = await getPackageManager();
+    const command = await getExecutableCommand("sst");
 
-    const command =
-      packageManager === "npm"
-        ? "npx"
-        : packageManager === "yarn"
-        ? "yarn"
-        : packageManager === "pnpm"
-        ? "pnpm"
-        : packageManager === "bun"
-        ? "bunx"
-        : "npx";
     // Update SST secrets
     execSync(
-      `${command} sst secret set Env '${JSON.stringify(envVars)}' --stage ${
+      `${command} secret set Env '${JSON.stringify(envVars)}' --stage ${
         options.stage
       }`,
       {

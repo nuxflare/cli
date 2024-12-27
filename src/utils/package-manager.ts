@@ -11,3 +11,13 @@ export async function getPackageManager(): Promise<string> {
     return "npm"; // Default to npm if something goes wrong
   }
 }
+
+export function getExecutableCommand(packageManager: string): string {
+  const npxMappings: { [key: string]: string } = {
+    npm: "npx",
+    yarn: "yarn dlx",
+    pnpm: "pnpx",
+    bun: "bunx",
+  };
+  return npxMappings[packageManager] || "npx";
+}

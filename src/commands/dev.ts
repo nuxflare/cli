@@ -2,7 +2,10 @@ import { spawn } from "child_process";
 import fs from "fs-extra";
 import path from "path";
 import chalk from "chalk";
-import { getPackageManager } from "../utils/package-manager";
+import {
+  getPackageManager,
+  getExecutableCommand,
+} from "../utils/package-manager";
 
 interface DevOptions {
   stage?: string;
@@ -56,18 +59,7 @@ export async function dev(options: DevOptions) {
   console.log(chalk.blue("🚀 Starting Nuxt development server..."));
 
   const packageManager = await getPackageManager();
-
-  // Different package managers have different ways to run nuxt
-  const command =
-    packageManager === "npm"
-      ? "npx"
-      : packageManager === "yarn"
-      ? "yarn"
-      : packageManager === "pnpm"
-      ? "pnpm"
-      : packageManager === "bun"
-      ? "bunx"
-      : "npx";
+  const command = getExecutableCommand(packageManager);
   const devProcess = spawn(command, ["nuxt", ...args], {
     stdio: "inherit",
     shell: true,

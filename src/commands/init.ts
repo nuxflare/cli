@@ -2,6 +2,7 @@ import inquirer from "inquirer";
 import chalk from "chalk";
 import fs from "fs-extra";
 import path from "path";
+import { getExecutableCommand } from "../utils/package-manager";
 
 export async function init() {
   try {
@@ -36,9 +37,7 @@ export async function init() {
     let templateContent = await fs.readFile(templatePath, "utf8");
     // Determine the correct commands based on package manager
     const npmCommand = answers.packageManager;
-    const npxCommand = `${answers.packageManager}${
-      answers.packageManager === "yarn" ? " dlx" : " npx"
-    }`;
+    const npxCommand = getExecutableCommand(answers.packageManager);
 
     templateContent = templateContent
       .replace("__PROJECT_NAME__", answers.projectName)
