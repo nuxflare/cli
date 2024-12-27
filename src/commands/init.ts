@@ -51,6 +51,9 @@ export async function init() {
       if (!gitignore.includes(".sst")) {
         await fs.appendFile(".gitignore", "\n.sst\n");
       }
+      if (!gitignore.includes("wrangler.json")) {
+        await fs.appendFile(".gitignore", "\nwrangler.json\n");
+      }
     } else {
       await fs.writeFile(".gitignore", ".sst\n");
     }
