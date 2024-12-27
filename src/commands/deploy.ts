@@ -1,11 +1,15 @@
 import { spawn } from "child_process";
 import chalk from "chalk";
-import { getExecutableCommand } from "../utils/package-manager";
+import {
+  getPackageManager,
+  getExecutableCommand,
+} from "../utils/package-manager";
 
 export async function deploy() {
   console.log(chalk.blue("🚀 Deploying..."));
 
-  const command = await getExecutableCommand("sst");
+  const packageManager = await getPackageManager();
+  const command = getExecutableCommand(packageManager);
   const args = ["deploy", ...process.argv.slice(3)];
 
   const deployProcess = spawn(command, args, {

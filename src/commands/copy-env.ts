@@ -2,7 +2,10 @@ import { readFileSync } from "fs";
 import { parse } from "dotenv";
 import { execSync } from "child_process";
 import inquirer from "inquirer";
-import { getExecutableCommand } from "../utils/package-manager";
+import {
+  getPackageManager,
+  getExecutableCommand,
+} from "../utils/package-manager";
 
 interface CopyEnvOptions {
   stage: string;
@@ -33,7 +36,8 @@ export async function copyEnv(options: CopyEnvOptions) {
       return;
     }
 
-    const command = await getExecutableCommand("sst");
+    const packageManager = await getPackageManager();
+    const command = getExecutableCommand(packageManager);
 
     // Update SST secrets
     execSync(
