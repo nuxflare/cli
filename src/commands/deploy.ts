@@ -15,6 +15,7 @@ export async function deploy() {
   const deployProcess = spawn(command, args, {
     stdio: "inherit",
     shell: true,
+    env: { ...process.env, NITRO_PRESET: "cloudflare-module" },
   });
 
   return new Promise<void>((resolve, reject) => {
