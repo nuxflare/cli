@@ -48,6 +48,7 @@ jobs:
       - name: Build Nuxflare
         working-directory: .
         run: |
+          pnpm i
           pnpm run build
 
       - name: Install deps
