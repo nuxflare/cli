@@ -1,8 +1,14 @@
 name: "Nuxflare Deploy"
 
 on:
+  {% if github_action_type == "full" %}
   push:
   pull_request:
+  {% elsif github_action_type == "prod" %}
+  push:
+    branches:
+      - main
+  {% endif %}
   workflow_dispatch:
     inputs:
       stage:
@@ -15,7 +21,10 @@ concurrency:
 
 jobs:
   deploy:
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    {% if github_action_type == "full" %}if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    {% elsif github_action_type == "prod" %}if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    {% else %}if: github.event_name == 'workflow_dispatch'
+    {% endif %}
     runs-on: ubuntu-latest
     permissions:
       contents: read

@@ -75,4 +75,4 @@ jobs:
           fi
 
           echo "Running: ${DEPLOY_CMD}"
-          node ../dist/index.js ${DEPLOY_CMD}
+          SST_STAGE=$STAGE pnpm exec sst deploy

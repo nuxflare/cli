@@ -86,9 +86,16 @@ export async function init() {
             placeholder:
               "e.g., dev.example.codes (stages like 'dev' will deploy to 'dev.dev.example.codes')",
           }),
-        setupGithubActions: () =>
-          p.confirm({
-            message: "Would you like to setup GitHub Actions?",
+        githubActions: () =>
+          p.select({
+            message: "How would you like to setup GitHub Actions?",
+            options: [
+              { value: "none", label: "Don't setup GitHub Actions" },
+              { value: "manual", label: "Manual deployments only (via workflow dispatch)" },
+              { value: "prod", label: "Automatic production deployments only (main branch)" },
+              { value: "full", label: "Full setup (automatic prod and preview deployments for PRs)" },
+            ],
+            initialValue: "none",
           }),
       },
       {
@@ -161,7 +168,7 @@ export async function init() {
       {
         title: "Setting up GitHub Actions",
         task: async () => {
-          if (!results.setupGithubActions) {
+          if (results.githubActions === "none") {
             return "GitHub Actions setup skipped";
           }
 
@@ -171,7 +178,10 @@ export async function init() {
           // Copy and render the action.yml template
           const engine = new Liquid()
           const template = engine.parse(await fs.readFile(path.join(initDir, "action.yml.liquid"), "utf8"));
-          const actionContent = await engine.render(template, { package_manager: results.packageManager });
+          const actionContent = await engine.render(template, { 
+            package_manager: results.packageManager,
+            github_action_type: results.githubActions
+          });
 
           await fs.writeFile(
             path.join(githubDir, "nuxflare-deploy.yml"),
