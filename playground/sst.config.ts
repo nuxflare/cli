@@ -1,13 +1,13 @@
 /// <reference path="./.sst/platform/config.d.ts" />
 import Nuxt from "./.nuxflare/utils/nuxt";
 
-const prodDomain = undefined;
-const devDomain = undefined;
+const prodDomain = "test.tanay.codes";
+const devDomain = "chat.tanay.codes";
 
 export default $config({
   app(input) {
     return {
-      name: "chat-with-pdf",
+      name: "tanay-chat",
       removal: input?.stage === "production" ? "retain" : "remove",
       protect: ["production"].includes(input?.stage),
       home: "cloudflare",

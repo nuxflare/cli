@@ -1,0 +1,69 @@
+name: "Nuxflare Deploy"
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: "The stage name to deploy to (optional). If not provided, a sanitized branch name will be used."
+        required: false
+        default: ""
+
+concurrency:
+  group: ${{ github.ref }}
+
+jobs:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: playground
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            playground/.sst
+          key: ${{ runner.os }}-sst-playground
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Deploy with SST.dev
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          # Determine deployment mode based on event type and inputs
+          if [ "${GITHUB_EVENT_NAME}" = "push" ] && [ "${GITHUB_REF}" = "refs/heads/${{ github.event.repository.default_branch }}" ]; then
+            echo "Production deployment detected"
+            DEPLOY_CMD="nuxflare deploy --production"
+          else
+            if [ -n "${{ github.event.inputs.stage }}" ]; then
+              STAGE="${{ github.event.inputs.stage }}"
+            else
+              # Sanitize branch name: lower-case and replace non-alphanumeric chars with dashes
+              STAGE=$(echo "${GITHUB_REF_NAME}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g')
+            fi
+            echo "Deploying to stage: ${STAGE}"
+            DEPLOY_CMD="nuxflare deploy --stage ${STAGE}"
+          fi
+
+          echo "Running: ${DEPLOY_CMD}"
+          npx ${DEPLOY_CMD}
