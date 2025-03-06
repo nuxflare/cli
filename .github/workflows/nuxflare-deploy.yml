@@ -69,4 +69,4 @@ jobs:
           fi
 
           echo "Running: ${DEPLOY_CMD}"
-          npx ${DEPLOY_CMD}
+          ../dist/index.js ${DEPLOY_CMD}
