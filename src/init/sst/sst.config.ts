@@ -9,7 +9,6 @@ export default $config({
     return {
       name: "__PROJECT_NAME__",
       removal: input?.stage === "production" ? "retain" : "remove",
-      protect: ["production"].includes(input?.stage),
       home: "cloudflare",
       providers: {
         cloudflare: true,
@@ -23,8 +22,8 @@ export default $config({
       $app.stage === "production"
         ? prodDomain || undefined
         : devDomain
-        ? `${$app.stage}.${devDomain}`
-        : undefined;
+          ? `${$app.stage}.${devDomain}`
+          : undefined;
     Nuxt("App", {
       dir: ".",
       domain,

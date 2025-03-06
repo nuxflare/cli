@@ -38,6 +38,7 @@ export async function executeSST(
           if (code === 0) {
             resolve();
           } else {
+            console.error("is this it")
             reject(new Error(`Process exited with code ${code}`));
           }
         });

@@ -40,6 +40,7 @@ async function displayProjectUrls(stage: string) {
       }
     }
   } catch (error) {
+    console.log("error project uurls", error)
     // If there's an error reading the directory, just skip URL display
     console.error("Unable to read deployment URLs");
   }
