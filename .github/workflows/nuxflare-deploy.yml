@@ -67,6 +67,7 @@ jobs:
               STAGE="${{ github.event.inputs.stage }}"
             else
               # Sanitize branch name: lower-case and replace non-alphanumeric chars with dashes
+              echo "${GITHUB_REF_NAME} and ${GITHUB_REF} and ${GITHUB_EVENT_NAME}"
               STAGE=$(echo "${GITHUB_REF_NAME}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g')
             fi
             echo "Deploying to stage: ${STAGE}"
