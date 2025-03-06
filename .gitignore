@@ -1,2 +1,11 @@
 node_modules
 dist
+
+# sst
+.sst
+
+# aider
+.aider*
+
+# ts
+tsconfig.tsbuildinfo

@@ -1,73 +1,98 @@
+import chalk from "chalk";
+import { log } from "@clack/prompts";
+import * as p from "@clack/prompts";
 import { spawn } from "child_process";
 import fs from "fs-extra";
 import path from "path";
-import chalk from "chalk";
 import {
   getPackageManager,
   getExecutableCommand,
-} from "../utils/package-manager";
+} from "../utils/package-manager.js";
 
 interface DevOptions {
   stage?: string;
+  production?: boolean;
 }
 
-export async function dev(options: DevOptions) {
-  const env = { ...process.env };
+async function getProjectConfig(stage: string) {
+  const stateDir = path.join(".nuxflare", "state", stage);
 
-  if (options.stage) {
-    const configPath = path.join(
-      process.cwd(),
-      ".sst/nuxflare",
-      `nuxthub_${options.stage}.json`,
-    );
+  try {
+    const apps = await fs.readdir(stateDir);
+    const app = apps[0];
+    if (!app) {
+      throw new Error("No apps found in stage");
+    }
 
-    try {
-      if (await fs.pathExists(configPath)) {
-        const config = await fs.readJson(configPath);
-        env.NUXT_HUB_PROJECT_URL = config.url;
-        env.NUXT_HUB_PROJECT_SECRET_KEY = config.secret;
-        console.log(
-          chalk.blue(`🔗 Connected to Hub (stage: ${options.stage})`),
-        );
-      } else {
-        console.error(
-          chalk.red(`❌ No configuration found for stage: ${options.stage}`),
-        );
-        console.error(
-          chalk.yellow(
-            `Deploy first using: nuxflare deploy --stage ${options.stage}`,
-          ),
-        );
-        process.exit(1);
+    const stateFilePath = path.join(stateDir, app, "state.json");
+    if (await fs.pathExists(stateFilePath)) {
+      const stateData = await fs.readJson(stateFilePath);
+      if (stateData.projectUrl && stateData.nuxtHubSecret) {
+        return {
+          url: stateData.projectUrl,
+          secret: stateData.nuxtHubSecret,
+        };
       }
-    } catch (error) {
-      console.error(chalk.red("Error reading Hub configuration:"), error);
+    }
+    throw new Error("Invalid state file");
+  } catch (error) {
+    throw new Error(`Failed to read project configuration: ${error}`);
+  }
+}
+
+export async function dev(options: DevOptions = {}) {
+  log.info("🚀 Starting development server...");
+
+  if (!options.stage && !options.production) {
+    p.cancel(
+      "Please specify a stage with the --stage flag or the --production flag.",
+    );
+    process.exit(1);
+  }
+
+  const devStage = options.production ? "production" : (options.stage as string);
+
+  if (options.stage === "production") {
+    log.warn(
+      "Warning: Development against production environment is not recommended."
+    );
+    const shouldContinue = await p.confirm({
+      message: "Do you want to continue?",
+    });
+    if (!shouldContinue) {
+      p.cancel("Development cancelled");
       process.exit(1);
     }
   }
 
-  const args = options.stage ? ["dev", "--remote"] : ["dev"];
+  try {
+    log.step(`Connecting to stage: ${devStage}`);
+    const config = await getProjectConfig(devStage);
 
-  if (!options.stage) {
-    console.warn(
-      chalk.yellow(
-        "⚠️  Warning: No stage specified. Running dev without connecting to a remote.",
-      ),
-    );
-  }
+    const env = {
+      ...process.env,
+      NUXT_HUB_PROJECT_URL: config.url,
+      NUXT_HUB_PROJECT_SECRET_KEY: config.secret,
+    };
 
-  console.log(chalk.blue("🚀 Starting Nuxt development server..."));
+    const packageManager = await getPackageManager();
+    const command = getExecutableCommand(packageManager);
 
-  const packageManager = await getPackageManager();
-  const command = getExecutableCommand(packageManager);
-  const devProcess = spawn(command, ["nuxt", ...args], {
-    stdio: "inherit",
-    shell: true,
-    env,
-  });
+    log.info(`Connected to ${devStage} (${chalk.blue(config.url)})`);
+    log.step("Starting Nuxt development server...");
 
-  devProcess.on("error", (err) => {
-    console.error(chalk.red("❌ Failed to start Nuxt dev server:"), err);
+    const devProcess = spawn(command, ["nuxt", "dev", "--remote"], {
+      stdio: "inherit",
+      shell: true,
+      env,
+    });
+
+    devProcess.on("error", (err) => {
+      throw new Error(`Failed to start Nuxt dev server: ${err}`);
+    });
+
+  } catch (error) {
+    log.error(`❌ Failed to start development server: ${error}`);
     process.exit(1);
-  });
+  }
 }

@@ -1,34 +1,68 @@
-import { spawn } from "child_process";
 import chalk from "chalk";
-import {
-  getPackageManager,
-  getExecutableCommand,
-} from "../utils/package-manager";
+import * as p from "@clack/prompts";
+import { log } from "@clack/prompts";
+import { executeSST } from "../utils/sst.js";
 
-export async function remove() {
-  console.log(chalk.blue("Removing..."));
+interface RemoveOptions {
+  stage?: string;
+  production?: boolean;
+}
 
-  const packageManager = await getPackageManager();
-  const command = getExecutableCommand(packageManager);
-  const args = ["sst", "remove", ...process.argv.slice(3)];
+export async function remove(options: RemoveOptions = {}) {
+  log.info("🗑️  Removing resources...");
 
-  const removeProcess = spawn(command, args, {
-    stdio: "inherit",
-    shell: true,
-  });
+  if (!options.stage && !options.production) {
+    p.cancel(
+      "Please specify a stage with the --stage flag or the --production flag.",
+    );
+    process.exit(1);
+  }
 
-  return new Promise<void>((resolve, reject) => {
-    removeProcess.on("close", (code) => {
-      if (code === 0) {
-        resolve();
-      } else {
-        reject(new Error(`Deploy process exited with code ${code}`));
+  try {
+    const removeStage = options.production
+      ? "production"
+      : (options.stage as string);
+
+    // Extra warning for production removals
+    if (removeStage === "production") {
+      log.warn(
+        chalk.yellow(
+          "⚠️  WARNING: You are about to remove PRODUCTION resources!",
+        ),
+      );
+      const shouldContinue = await p.confirm({
+        message: "Are you absolutely sure you want to remove production resources?",
+      });
+      if (!shouldContinue) {
+        p.cancel("Operation cancelled");
+        process.exit(1);
       }
-    });
+    } else {
+      // For non-production stages, still confirm but with less dramatic warning
+      const shouldContinue = await p.confirm({
+        message: `Are you sure you want to remove resources from the "${removeStage}" stage?`,
+      });
+      if (!shouldContinue) {
+        p.cancel("Operation cancelled");
+        process.exit(1);
+      }
+    }
 
-    removeProcess.on("error", (err) => {
-      console.error(chalk.red("❌ Removal failed:"), err);
-      reject(err);
-    });
-  });
+    log.step(`Removing resources from stage: ${removeStage}`);
+
+    try {
+      await executeSST(["remove", "--stage", removeStage], {
+        stdio: "inherit",
+      });
+      log.success(`✅ Successfully removed resources from ${removeStage}!`);
+    } catch (error) {
+      throw new Error(
+        `Removal failed: ${error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
+  } catch (error) {
+    log.error(`❌ Removal failed: ${error}`);
+    process.exit(1);
+  }
 }

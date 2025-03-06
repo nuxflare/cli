@@ -87,3 +87,7 @@ npx nuxflare dev --stage dev
 ```
 
 This command starts the Nuxt development server and connects to the specified remote using `NUXT_HUB_PROJECT_URL` and `NUXT_HUB_PROJECT_SECRET_KEY`.
+
+full config process similar to nuxthub, better ui. link to create token.
+better explanations and user friendly.
+better updates

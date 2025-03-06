@@ -1,45 +1,62 @@
 #!/usr/bin/env node
+
 import { Command } from "commander";
-import { init } from "./commands/init";
-import { deploy } from "./commands/deploy";
-import { remove } from "./commands/remove";
-import { dev } from "./commands/dev";
-import { copyEnv } from "./commands/copy-env";
+import { readFileSync } from 'fs';
+import path from 'path';
+import { init } from "./commands/init.js";
+import { deploy } from "./commands/deploy.js";
+import { remove } from "./commands/remove.js";
+import { dev } from "./commands/dev.js";
+import { copyEnv } from "./commands/copy-env.js";
+import updateNotifier from "update-notifier";
+import { rootPath } from "./utils/dirname.js";
 
-const program = new Command();
+const pkgJsonPath = path.join(rootPath, '../package.json');
+const pkg = JSON.parse(readFileSync(pkgJsonPath, 'utf8'));
 
-program
-  .name("nuxflare")
-  .description("CLI tool for deploying Nuxt apps to Cloudflare")
-  .version("1.0.0");
+function checkForUpdates() {
+  updateNotifier({ pkg }).notify();
+}
 
-program
-  .command("init")
-  .description("Initialize nuxflare in your Nuxt project")
-  .action(init);
+function run() {
+  checkForUpdates();
 
-program
-  .command("deploy")
-  .description("Deploy your Nuxt app to Cloudflare")
-  .allowUnknownOption(true)
-  .action(deploy);
+  const program = new Command();
+  program
+    .name("nuxflare")
+    .description("Deploy your Nuxt apps to Cloudflare using Nuxflare CLI.")
+    .version(pkg.version);
+  program
+    .command("init")
+    .description("initialize Nuxflare in your existing Nuxt project")
+    .action(init);
+  program
+    .command("deploy")
+    .description("deploy your project to Cloudflare.")
+    .option("--production", "deploy your project to production")
+    .option("--stage <stage>", "deploy your project to a preview stage")
+    .action(deploy);
+  program
+    .command("remove")
+    .description("remove all resources for a deployment")
+    .option("--production", "remove resources for the production deployment")
+    .option("--stage <stage>", "remove resources for a preview deployment")
+    .action(remove);
+  program
+    .command("dev")
+    .description("run nuxt dev server while connecting to remote resources")
+    .option("--production", "Connect to production resources")
+    .option("--stage <stage>", "Connect to resources for a preview stage")
+    .action(dev);
+  program
+    .command("copy-env")
+    .alias("load-env")
+    .description("load environment variables from a .env file")
+    .option("--production", "Load environment for production")
+    .option("--stage <stage>", "Load environment for a preview stage")
+    .option("--file <file>", "Specify a custom .env file path")
+    .action(copyEnv);
+  program.parse();
+}
 
-program
-  .command("remove")
-  .description("Remove all resources")
-  .allowUnknownOption(true)
-  .action(remove);
-
-program
-  .command("dev")
-  .description("Run Nuxt dev server with remote")
-  .option("--stage <stage>", "Stage to use for Hub integration")
-  .action(dev);
-
-program
-  .command("copy-env")
-  .description("Copy environment variables from .env")
-  .requiredOption("--stage <stage>", "Stage to copy environment variables to")
-  .action(copyEnv);
-
-program.parse();
+run();

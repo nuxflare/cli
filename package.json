@@ -7,28 +7,43 @@
     "nuxflare": "dist/index.js"
   },
   "scripts": {
-    "build": "tsc && mkdir -p dist/templates && cp src/templates/* dist/templates/",
+    "compile": "tsc -b",
+    "build": "rm -rf dist && pnpm compile && chmod +x dist/index.js && cp -r src/init dist/init",
     "dev": "tsc -w",
-    "prepare": "npm run build"
+    "prepare": "pnpm build",
+    "release": "release-it"
   },
   "dependencies": {
-    "chalk": "^4.1.2",
-    "commander": "^11.1.0",
+    "@clack/prompts": "^0.10.0",
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0",
     "dotenv": "^16.4.7",
     "fs-extra": "^11.2.0",
-    "inquirer": "^8.2.6"
+    "liquidjs": "^10.21.0",
+    "terminal-link": "^3.0.0",
+    "update-notifier": "^7.3.1"
   },
+  "type": "module",
   "devDependencies": {
+    "@cloudflare/workers-types": "4.20250224.0",
     "@types/fs-extra": "^11.0.4",
     "@types/inquirer": "^8.2.10",
     "@types/node": "^20.10.5",
+    "@types/update-notifier": "^6.0.8",
+    "esbuild": "^0.25.0",
+    "release-it": "^18.1.2",
     "typescript": "^5.3.3"
   },
   "keywords": [],
   "author": "Tanay Karnik",
   "license": "MIT",
   "files": [
-    "dist/**/*",
-    "dist/templates/*"
-  ]
+    "dist/**/*"
+  ],
+  "release-it": {
+    "$schema": "https://unpkg.com/release-it/schema/release-it.json",
+    "github": {
+      "release": true
+    }
+  }
 }
