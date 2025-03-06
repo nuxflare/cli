@@ -227,21 +227,33 @@ export async function init() {
 
     log.success(chalk.green("✅ Successfully initialized Nuxflare!"));
 
+    const nextSteps = [
+      `1. Run ${chalk.cyan(
+        "nuxflare deploy --stage <stage>",
+      )} to do a preview deployment.`,
+      `2. Run ${chalk.cyan(
+        "nuxflare deploy --production",
+      )} to deploy to production.`,
+      `3. Run ${chalk.cyan(
+        "nuxflare dev --stage <stage>",
+      )} to run a local dev server and connect to remote resources.`,
+      `4. Run ${chalk.cyan(
+        "nuxflare copy-env --stage <stage> --file .env",
+      )} to copy environment variables from a .env file to a stage.`
+    ];
+    
+    if (results.githubActions !== "none") {
+      nextSteps.push(
+        `5. ${chalk.yellow("Important:")} Review your GitHub Actions workflow in ${chalk.cyan(
+          ".github/workflows/nuxflare-deploy.yml"
+        )} and add your ${chalk.cyan(
+          "CLOUDFLARE_API_TOKEN"
+        )} to your repository secrets by going to Settings > Secrets and variables > Actions > New repository secret.`
+      );
+    }
+
     p.note(
-      [
-        `1. Run ${chalk.cyan(
-          "nuxflare deploy --stage <stage>",
-        )} to do a preview deployment.`,
-        `2. Run ${chalk.cyan(
-          "nuxflare deploy --production",
-        )} to deploy to production.`,
-        `3. Run ${chalk.cyan(
-          "nuxflare dev --stage <stage>",
-        )} to run a local dev server and connect to remote resources.`,
-        `4. Run ${chalk.cyan(
-          "nuxflare copy-env --stage <stage> --file .env",
-        )} to copy environment variables from a .env file to a stage.`
-      ].join("\n"),
+      nextSteps.join("\n"),
       "Next steps",
     );
   } catch (error) {

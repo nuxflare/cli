@@ -54,6 +54,9 @@ jobs:
       - name: Install deps
         run: pnpm install --frozen-lockfile
 
+      - name: Install SST
+        run: "curl -fsSL https://ion.sst.dev/install | bash"
+
       - name: Deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -75,5 +78,5 @@ jobs:
           fi
 
           echo "Running: ${DEPLOY_CMD}"
-          SST_STAGE=$STAGE pnpm exec sst install
-          SST_STAGE=$STAGE pnpm exec sst deploy
+          SST_STAGE=$STAGE sst install
+          SST_STAGE=$STAGE sst deploy
