@@ -24,34 +24,9 @@ export async function executeSST(
     const stdio = options.stdio || "pipe";
     const cwd = options.cwd || process.cwd();
     const env = options.env ? { ...process.env, ...options.env } : process.env;
-
-    if (stdio === "inherit") {
-      return new Promise<void>((resolve, reject) => {
-        const childProcess = spawn(command, args, {
-          stdio,
-          cwd,
-          env,
-          shell: true,
-        });
-
-        childProcess.on("close", (code) => {
-          if (code === 0) {
-            resolve();
-          } else {
-            console.error("is this it")
-            reject(new Error(`Process exited with code ${code}`));
-          }
-        });
-
-        childProcess.on("error", (err) => {
-          reject(err);
-        });
-      });
-    } else {
-      return execSync(`${command} ${args.join(" ")}`, { stdio, cwd, env })
-        .toString()
-        .trim();
-    }
+    return execSync(`${command} ${args.join(" ")}`, { stdio, cwd, env })
+      .toString()
+      .trim();
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(`Failed to execute SST command: ${error.message}`);
