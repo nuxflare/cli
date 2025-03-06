@@ -88,7 +88,7 @@ export async function deploy(options: DeployOptions = {}) {
     log.step(`Deploying to stage: ${deployStage}`);
 
     try {
-      await executeSST(["deploy", "--stage", deployStage], {
+      await executeSST(["deploy", "--stage", deployStage, "--verbose"], {
         stdio: "inherit",
         env: {
           NITRO_PRESET: "cloudflare-module",
