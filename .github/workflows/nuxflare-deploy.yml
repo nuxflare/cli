@@ -45,6 +45,11 @@ jobs:
           node-version: 20
           cache: pnpm
 
+      - name: Build Nuxflare
+        working-directory: .
+        run: |
+          pnpm run build
+
       - name: Install deps
         run: pnpm install --frozen-lockfile
 
@@ -55,7 +60,7 @@ jobs:
           # Determine deployment mode based on event type and inputs
           if [ "${GITHUB_EVENT_NAME}" = "push" ] && [ "${GITHUB_REF}" = "refs/heads/${{ github.event.repository.default_branch }}" ]; then
             echo "Production deployment detected"
-            DEPLOY_CMD="nuxflare deploy --production"
+            DEPLOY_CMD="deploy --production"
           else
             if [ -n "${{ github.event.inputs.stage }}" ]; then
               STAGE="${{ github.event.inputs.stage }}"
@@ -64,8 +69,8 @@ jobs:
               STAGE=$(echo "${GITHUB_REF_NAME}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g')
             fi
             echo "Deploying to stage: ${STAGE}"
-            DEPLOY_CMD="nuxflare deploy --stage ${STAGE}"
+            DEPLOY_CMD="deploy --stage ${STAGE}"
           fi
 
           echo "Running: ${DEPLOY_CMD}"
-          npx ${DEPLOY_CMD}
+          node ../dist/index.js ${DEPLOY_CMD}
