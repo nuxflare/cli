@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-defineProps<{ loading: boolean }>()
+defineProps<{ loading: boolean }>();
 
-const message = ref('')
-const emit = defineEmits<{ message: [message: string] }>()
+const message = ref("");
+const emit = defineEmits<{ message: [message: string] }>();
 
 const sendMessage = () => {
-  if (!message.value.trim()) return
-  emit('message', message.value)
-  message.value = ''
-}
+  if (!message.value.trim()) return;
+  emit("message", message.value);
+  message.value = "";
+};
 </script>
 
 <template>
@@ -31,7 +31,7 @@ const sendMessage = () => {
       size="sm"
       icon="i-heroicons-arrow-up-20-solid"
       class="absolute top-5 right-5"
-      :disabled="loading "
+      :disabled="loading"
       @click="sendMessage"
     />
   </div>

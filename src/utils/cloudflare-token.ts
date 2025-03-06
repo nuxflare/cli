@@ -1,10 +1,10 @@
 import * as p from "@clack/prompts";
 import chalk from "chalk";
-import fs from "fs-extra";
 import path from "path";
 import os from "os";
 import { exec } from "child_process";
 import terminalLink from "terminal-link";
+import { pathExists, ensureDir, writeJson, readJson } from "./fs.js";
 
 const TOKEN_DIR = path.join(os.homedir(), ".nuxflare");
 const TOKEN_FILE = path.join(TOKEN_DIR, "token.json");
@@ -36,8 +36,8 @@ async function verifyToken(token: string): Promise<boolean> {
  * @param token The Cloudflare API token to store
  */
 async function storeToken(token: string): Promise<void> {
-  await fs.ensureDir(TOKEN_DIR);
-  await fs.writeJson(TOKEN_FILE, { token }, { spaces: 2 });
+  await ensureDir(TOKEN_DIR);
+  await writeJson(TOKEN_FILE, { token }, { spaces: 2 });
 }
 
 /**
@@ -52,8 +52,8 @@ async function getExistingToken(): Promise<string | null> {
 
   // Check stored file
   try {
-    if (await fs.pathExists(TOKEN_FILE)) {
-      const data = await fs.readJson(TOKEN_FILE);
+    if (await pathExists(TOKEN_FILE)) {
+      const data = await readJson(TOKEN_FILE);
       return data.token;
     }
   } catch (error) {

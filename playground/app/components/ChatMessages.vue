@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { RoleScopedChatInput } from '~/types'
+import type { RoleScopedChatInput } from "~/types";
 
-defineProps<{ messages: RoleScopedChatInput[] }>()
+defineProps<{ messages: RoleScopedChatInput[] }>();
 
 // scroll to bottom
 // const chatContainer = useTemplateRef('chatContainer')
@@ -29,18 +29,18 @@ defineProps<{ messages: RoleScopedChatInput[] }>()
 //   }
 // })
 
-const informativeMessage = useInformativeMessage()
-const relevantContext = useRelevantContext()
-const queries = useQueries()
+const informativeMessage = useInformativeMessage();
+const relevantContext = useRelevantContext();
+const queries = useQueries();
 </script>
 
 <template>
   <div class="flex flex-col p-3 pb-0 space-y-2 h-full">
-    <template
-      v-for="(message, index) in messages"
-      :key="`message-${index}`"
-    >
-      <div v-if="message.role === 'user'" class="flex items-center self-end bg-zinc-200 dark:bg-zinc-900 rounded-full px-3 py-1">
+    <template v-for="(message, index) in messages" :key="`message-${index}`">
+      <div
+        v-if="message.role === 'user'"
+        class="flex items-center self-end bg-zinc-200 dark:bg-zinc-900 rounded-full px-3 py-1"
+      >
         <p>{{ message.content }}</p>
       </div>
 
@@ -48,7 +48,10 @@ const queries = useQueries()
     </template>
 
     <!-- Progress message -->
-    <div v-if="informativeMessage !== ''" class="flex gap-1.5 items-center px-3 pt-2 pb-1">
+    <div
+      v-if="informativeMessage !== ''"
+      class="flex gap-1.5 items-center px-3 pt-2 pb-1"
+    >
       <LoadingIcon class="size-4" />
       <p class="text-sm text-gray-500">
         {{ informativeMessage }}
@@ -67,9 +70,7 @@ const queries = useQueries()
       </div>
 
       <template #body>
-        <h2 class="font-semibold text-lg mb-1">
-          Queries to vector database
-        </h2>
+        <h2 class="font-semibold text-lg mb-1">Queries to vector database</h2>
         <ul class="list-disc pl-4">
           <li v-for="(context, i) in queries" :key="i">
             {{ context }}
@@ -86,9 +87,7 @@ const queries = useQueries()
           </li>
         </ul>
 
-        <p v-if="!relevantContext.context.length">
-          No relevant context
-        </p>
+        <p v-if="!relevantContext.context.length">No relevant context</p>
       </template>
     </USlideover>
   </div>

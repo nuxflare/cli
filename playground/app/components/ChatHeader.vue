@@ -26,5 +26,5 @@
 </template>
 
 <script setup lang="ts">
-defineEmits(['showDrawer'])
+defineEmits(["showDrawer"]);
 </script>

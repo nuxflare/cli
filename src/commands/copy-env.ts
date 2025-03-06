@@ -16,7 +16,7 @@ interface CopyEnvOptions {
 }
 
 export async function copyEnv(options: CopyEnvOptions = {}) {
-  log.info("📋Preparing to copy environment variables...");
+  p.intro("📋Preparing to copy environment variables...");
 
   if (!options.stage && !options.production) {
     p.cancel(
@@ -26,7 +26,9 @@ export async function copyEnv(options: CopyEnvOptions = {}) {
   }
 
   const envFile = options.file || ".env";
-  const deployStage = options.production ? "production" : (options.stage as string);
+  const deployStage = options.production
+    ? "production"
+    : (options.stage as string);
 
   try {
     // Validate .env file exists
@@ -43,7 +45,9 @@ export async function copyEnv(options: CopyEnvOptions = {}) {
 
     if (Object.keys(envVars).length === 0) {
       p.cancel(
-        chalk.yellow(`⚠️ No environment variables found in ${chalk.bold(envFile)}`),
+        chalk.yellow(
+          `⚠️ No environment variables found in ${chalk.bold(envFile)}`,
+        ),
       );
       process.exit(1);
     }
@@ -73,26 +77,33 @@ export async function copyEnv(options: CopyEnvOptions = {}) {
 
     try {
       execSync(
-        `${command} sst secret set Env '${JSON.stringify(envVars)}' --stage ${deployStage}`,
+        `${command} sst secret set Env '${JSON.stringify(
+          envVars,
+        )}' --stage ${deployStage}`,
         {
           stdio: "ignore",
         },
       );
 
-      s.stop(`Environment variables successfully copied to ${chalk.bold(deployStage)}!`);
+      s.stop(
+        `Environment variables successfully copied to ${chalk.bold(
+          deployStage,
+        )}!`,
+      );
 
       const deployCommand = options.production
         ? "nuxflare deploy --production"
         : `nuxflare deploy --stage ${deployStage}`;
       p.outro(
         `💡 To apply these changes, you need to redeploy your application:\n   ${chalk.blue(
-          deployCommand
-        )}`
+          deployCommand,
+        )}`,
       );
     } catch (error) {
       s.stop(`Failed to copy environment variables`);
       throw new Error(
-        `Failed to update environment variables: ${error instanceof Error ? error.message : String(error)
+        `Failed to update environment variables: ${
+          error instanceof Error ? error.message : String(error)
         }`,
       );
     }

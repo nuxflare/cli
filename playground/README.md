@@ -53,21 +53,21 @@ The way it works is this:
 ## 🚀 Quick Start
 
 1. Install dependencies with [pnpm](https://pnpm.io)
-    ```bash
-    pnpm install
-    ```
+   ```bash
+   pnpm install
+   ```
 2. Create & link a NuxtHub project to enable running AI models on your Cloudflare account
-    ```bash
-    npx nuxthub link
-    ```
-4. Deploy the application to your Cloudflare account
-    ```bash
-    npx nuxthub deploy
-    ```
+   ```bash
+   npx nuxthub link
+   ```
+3. Deploy the application to your Cloudflare account
+   ```bash
+   npx nuxthub deploy
+   ```
 4. Launch the dev server
-    ```bash
-    pnpm dev --remote
-    ```
+   ```bash
+   pnpm dev --remote
+   ```
 
 Visit `http://localhost:3000` and start chatting with documents!
 
@@ -88,6 +88,7 @@ npx nuxthub deploy
 This command will deploy your Chat with PDF instance to your Cloudflare account and provision a Cloudflare R2 bucket. You will also get a free `<your-app>.nuxt.dev` domain.
 
 What's included in Cloudflare free plan:
+
 - 100,000 requests/day
 - 10 GB storage on Cloudflare R2
 - 10,000 tokens a day for Workers AI

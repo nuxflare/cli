@@ -7,55 +7,54 @@ export function useStream<T>(
   async function* response(): AsyncGenerator<T, void, unknown> {
     try {
       const response = await $fetch(endpoint, {
-        method: 'POST',
+        method: "POST",
         body,
-        responseType: 'stream',
-      })
+        responseType: "stream",
+      });
 
-      if (!(response instanceof ReadableStream)) throw new Error('Expected a stream response')
+      if (!(response instanceof ReadableStream))
+        throw new Error("Expected a stream response");
 
-      let buffer = ''
+      let buffer = "";
       const reader = (response as ReadableStream)
         .pipeThrough(new TextDecoderStream())
-        .getReader()
+        .getReader();
 
       while (true) {
-        const { value, done } = await reader.read()
+        const { value, done } = await reader.read();
 
         if (done) {
           if (buffer.trim()) {
-            console.warn('Stream ended with unparsed data:', buffer)
+            console.warn("Stream ended with unparsed data:", buffer);
           }
-          return
+          return;
         }
 
-        buffer += value
-        const lines = buffer.split('\n')
-        buffer = lines.pop() || ''
+        buffer += value;
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
 
         for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice('data: '.length).trim()
-            if (data === '[DONE]') return
+          if (line.startsWith("data: ")) {
+            const data = line.slice("data: ".length).trim();
+            if (data === "[DONE]") return;
 
             try {
-              const jsonData = JSON.parse(data)
+              const jsonData = JSON.parse(data);
               if (jsonData) {
-                yield jsonData
+                yield jsonData;
               }
-            }
-            catch (parseError) {
-              console.warn('Error parsing JSON:', parseError)
+            } catch (parseError) {
+              console.warn("Error parsing JSON:", parseError);
             }
           }
         }
       }
-    }
-    catch (error) {
-      console.error('Error sending message:', error)
-      throw error
+    } catch (error) {
+      console.error("Error sending message:", error);
+      throw error;
     }
   }
 
-  return response
+  return response;
 }

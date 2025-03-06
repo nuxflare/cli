@@ -32,7 +32,7 @@
     "drizzle-kit": "^0.30.0",
     "eslint": "^9.16.0",
     "nuxthub-ratelimit": "^1.0.4",
-    "sst": "^3.9.26",
+    "sst": "^3.9.27",
     "vue-tsc": "^2.1.10",
     "wrangler": "^3.95.0",
     "zod": "^3.24.1"

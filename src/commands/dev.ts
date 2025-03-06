@@ -2,46 +2,19 @@ import chalk from "chalk";
 import { log } from "@clack/prompts";
 import * as p from "@clack/prompts";
 import { spawn } from "child_process";
-import fs from "fs-extra";
-import path from "path";
 import {
   getPackageManager,
   getExecutableCommand,
 } from "../utils/package-manager.js";
+import { getProjectConfig } from "../utils/project-config.js";
 
 interface DevOptions {
   stage?: string;
   production?: boolean;
 }
 
-async function getProjectConfig(stage: string) {
-  const stateDir = path.join(".nuxflare", "state", stage);
-
-  try {
-    const apps = await fs.readdir(stateDir);
-    const app = apps[0];
-    if (!app) {
-      throw new Error("No apps found in stage");
-    }
-
-    const stateFilePath = path.join(stateDir, app, "state.json");
-    if (await fs.pathExists(stateFilePath)) {
-      const stateData = await fs.readJson(stateFilePath);
-      if (stateData.projectUrl && stateData.nuxtHubSecret) {
-        return {
-          url: stateData.projectUrl,
-          secret: stateData.nuxtHubSecret,
-        };
-      }
-    }
-    throw new Error("Invalid state file");
-  } catch (error) {
-    throw new Error(`Failed to read project configuration: ${error}`);
-  }
-}
-
 export async function dev(options: DevOptions = {}) {
-  log.info("🚀 Starting development server...");
+  p.intro("🚀 Starting development server...");
 
   if (!options.stage && !options.production) {
     p.cancel(
@@ -50,11 +23,13 @@ export async function dev(options: DevOptions = {}) {
     process.exit(1);
   }
 
-  const devStage = options.production ? "production" : (options.stage as string);
+  const devStage = options.production
+    ? "production"
+    : (options.stage as string);
 
   if (options.stage === "production") {
     log.warn(
-      "Warning: Development against production environment is not recommended."
+      "Warning: Development against production environment is not recommended.",
     );
     const shouldContinue = await p.confirm({
       message: "Do you want to continue?",
@@ -90,7 +65,6 @@ export async function dev(options: DevOptions = {}) {
     devProcess.on("error", (err) => {
       throw new Error(`Failed to start Nuxt dev server: ${err}`);
     });
-
   } catch (error) {
     log.error(`❌ Failed to start development server: ${error}`);
     process.exit(1);

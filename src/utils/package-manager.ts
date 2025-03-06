@@ -1,22 +1,21 @@
-import fs from "fs-extra";
 import path from "path";
+import { pathExists, readJson } from "./fs.js";
 
 export async function getPackageManager(): Promise<string> {
   try {
     // Try to read from the config.json file
     const configPath = path.join(".nuxflare", "state", "config.json");
-    if (await fs.pathExists(configPath)) {
-      const config = await fs.readJson(configPath);
+    if (await pathExists(configPath)) {
+      const config = await readJson(configPath);
       if (config.packageManager) {
         return config.packageManager;
       }
     }
-
     // Fallback to detecting based on lockfiles
-    if ((await fs.pathExists("bun.lockb")) || (await fs.pathExists("bun.lock")))
+    if ((await pathExists("bun.lockb")) || (await pathExists("bun.lock")))
       return "bun";
-    if (await fs.pathExists("pnpm-lock.yaml")) return "pnpm";
-    if (await fs.pathExists("yarn.lock")) return "yarn";
+    if (await pathExists("pnpm-lock.yaml")) return "pnpm";
+    if (await pathExists("yarn.lock")) return "yarn";
     return "npm";
   } catch (error) {
     return "npm"; // Default to npm if something goes wrong

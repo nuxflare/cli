@@ -183,6 +183,12 @@ async function Nuxt(
 ) {
   const packageManagerX = PACKAGE_MANAGER_COMMANDS[packageManager];
   const projectPath = path.resolve(dir);
+  // we use relative path for places where pulumi stores the path
+  // this is to ensure we don't let pulumi store device specific paths
+  const projectPathRelative = path.relative(
+    path.resolve("./.sst/platform"),
+    path.resolve(dir),
+  );
   const environment = new sst.Secret("Env", "{}");
   const nuxtConfig = await loadNuxtConfig({ cwd: projectPath });
   const hubConfig = nuxtConfig.hub || {};
@@ -248,9 +254,9 @@ async function Nuxt(
     for (const [name, config] of Object.entries(hubConfig.vectorize)) {
       const indexName = `${$app.name}-${$app.stage}-${name}`;
       const index = new command.local.Command(`Vector${indexName}`, {
-        dir: projectPath,
-        create: `${packageManagerX} wrangler vectorize create ${indexName} --dimensions=${config.dimensions} --metric=${config.metric}`,
-        delete: `${packageManagerX} wrangler vectorize delete ${indexName} --force`,
+        dir: projectPathRelative,
+        create: `${packageManagerX} wrangler vectorize create ${indexName} --dimensions=${config.dimensions} --metric=${config.metric} || true`,
+        delete: `${packageManagerX} wrangler vectorize delete ${indexName} --force || true`,
       });
       resources.push(index);
       for (const [propertyName, type] of Object.entries(
@@ -259,9 +265,9 @@ async function Nuxt(
         new command.local.Command(
           `MetadataIndex${indexName}${propertyName}`,
           {
-            dir: projectPath,
-            create: `${packageManagerX} wrangler vectorize create-metadata-index ${indexName} --property-name=${propertyName} --type=${type}`,
-            delete: `${packageManagerX} wrangler vectorize delete-metadata-index ${indexName} --property-name=${propertyName}`,
+            dir: projectPathRelative,
+            create: `${packageManagerX} wrangler vectorize create-metadata-index ${indexName} --property-name=${propertyName} --type=${type} || true`,
+            delete: `${packageManagerX} wrangler vectorize delete-metadata-index ${indexName} --property-name=${propertyName} || true`,
           },
           {
             dependsOn: [index],
@@ -297,7 +303,7 @@ async function Nuxt(
     const deploy = new command.local.Command(
       `${name}WorkerVersion`,
       {
-        dir: projectPath,
+        dir: projectPathRelative,
         create: `${packageManagerX} wrangler deploy --config ${wranglerConfigPath}`,
         triggers: [new Date().toString()],
         logging: command.local.Logging.Stderr,
@@ -314,42 +320,52 @@ async function Nuxt(
       } else {
         const apiToken = process.env.CLOUDFLARE_API_TOKEN;
         if (!apiToken) {
-          console.error('CLOUDFLARE_API_TOKEN environment variable is required');
+          console.error(
+            "CLOUDFLARE_API_TOKEN environment variable is required",
+          );
           return;
         }
         // First, get the account ID if not set
-        let accountId = process.env.CLOUDFLARE_DEFAULT_ACCOUNT_ID || process.env.CLOUDFLARE_ACCOUNT_ID;
+        let accountId =
+          process.env.CLOUDFLARE_DEFAULT_ACCOUNT_ID ||
+          process.env.CLOUDFLARE_ACCOUNT_ID;
         if (!accountId) {
-          const accountResponse = await fetch('https://api.cloudflare.com/client/v4/accounts', {
-            headers: {
-              'Authorization': `Bearer ${apiToken}`,
-              'Content-Type': 'application/json'
-            }
-          });
+          const accountResponse = await fetch(
+            "https://api.cloudflare.com/client/v4/accounts",
+            {
+              headers: {
+                Authorization: `Bearer ${apiToken}`,
+                "Content-Type": "application/json",
+              },
+            },
+          );
           const accountData = await accountResponse.json();
           if (!accountData.success || !accountData.result?.[0]?.id) {
-            console.error('Failed to fetch Cloudflare account ID');
+            console.error("Failed to fetch Cloudflare account ID");
             return;
           }
           accountId = accountData.result[0].id;
         }
         // Then proceed with getting the workers subdomain
-        const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/workers/subdomain`, {
-          headers: {
-            'Authorization': `Bearer ${apiToken}`,
-            'Content-Type': 'application/json'
-          }
-        });
+        const response = await fetch(
+          `https://api.cloudflare.com/client/v4/accounts/${accountId}/workers/subdomain`,
+          {
+            headers: {
+              Authorization: `Bearer ${apiToken}`,
+              "Content-Type": "application/json",
+            },
+          },
+        );
         const data = await response.json();
         if (data.success) {
           const workersDomain = data.result.subdomain;
           projectUrl = `https://${wrangler.name}.${workersDomain}.workers.dev`;
         } else {
-          console.error('Failed to fetch workers subdomain');
-          projectUrl = '';
+          console.error("Failed to fetch workers subdomain");
+          projectUrl = "";
         }
       }
-      const stateFile = path.resolve(stateDir, 'state.json');
+      const stateFile = path.resolve(stateDir, "state.json");
       const stateData = {
         projectUrl,
         nuxtHubSecret: secret,
@@ -360,8 +376,8 @@ async function Nuxt(
     new command.local.Command(
       `${name}Worker`,
       {
-        dir: projectPath,
-        delete: `${packageManagerX} wrangler delete --name ${wrangler.name}`,
+        dir: projectPathRelative,
+        delete: `${packageManagerX} wrangler delete --name ${wrangler.name} || true`,
       },
       {
         dependsOn: [deploy],
@@ -373,11 +389,12 @@ async function Nuxt(
         new command.local.Command(
           `${name}Migrations`,
           {
-            dir: projectPath,
-            create: `${existsSync(migrationsPath)
-              ? `${packageManagerX} wrangler --config ${wranglerConfigPath} d1 migrations apply ${name} --remote`
-              : 'echo "Migrations directory not found, skipping."'
-              }`,
+            dir: projectPathRelative,
+            create: `${
+              existsSync(migrationsPath)
+                ? `${packageManagerX} wrangler --config ${wranglerConfigPath} d1 migrations apply ${name} --remote`
+                : 'echo "Migrations directory not found, skipping."'
+            }`,
             triggers: [new Date().toString()],
           },
           { dependsOn: [deploy] },

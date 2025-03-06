@@ -1,5 +1,5 @@
 /// <reference path="./.sst/platform/config.d.ts" />
-import Nuxt from "./.nuxflare/utils/nuxt";
+import Nuxt from "./nuxflare/nuxt";
 
 const prodDomain = "__PROD_DOMAIN__";
 const devDomain = "__DEV_DOMAIN__";
@@ -9,7 +9,6 @@ export default $config({
     return {
       name: "__PROJECT_NAME__",
       removal: input?.stage === "production" ? "retain" : "remove",
-      protect: ["production"].includes(input?.stage),
       home: "cloudflare",
       providers: {
         cloudflare: true,

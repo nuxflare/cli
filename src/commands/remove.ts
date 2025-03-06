@@ -9,7 +9,7 @@ interface RemoveOptions {
 }
 
 export async function remove(options: RemoveOptions = {}) {
-  log.info("🗑️  Removing resources...");
+  p.intro("🗑️  Removing resources...");
 
   if (!options.stage && !options.production) {
     p.cancel(
@@ -31,7 +31,8 @@ export async function remove(options: RemoveOptions = {}) {
         ),
       );
       const shouldContinue = await p.confirm({
-        message: "Are you absolutely sure you want to remove production resources?",
+        message:
+          "Are you absolutely sure you want to remove production resources?",
       });
       if (!shouldContinue) {
         p.cancel("Operation cancelled");
@@ -57,7 +58,8 @@ export async function remove(options: RemoveOptions = {}) {
       log.success(`✅ Successfully removed resources from ${removeStage}!`);
     } catch (error) {
       throw new Error(
-        `Removal failed: ${error instanceof Error ? error.message : String(error)
+        `Removal failed: ${
+          error instanceof Error ? error.message : String(error)
         }`,
       );
     }
