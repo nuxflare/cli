@@ -178,7 +178,7 @@ export async function init() {
           // Copy and render the action.yml template
           const engine = new Liquid()
           const template = engine.parse(await fs.readFile(path.join(initDir, "action.yml.liquid"), "utf8"));
-          const actionContent = await engine.render(template, { 
+          const actionContent = await engine.render(template, {
             package_manager: results.packageManager,
             github_action_type: results.githubActions
           });
@@ -241,7 +241,7 @@ export async function init() {
         "nuxflare copy-env --stage <stage> --file .env",
       )} to copy environment variables from a .env file to a stage.`
     ];
-    
+
     if (results.githubActions !== "none") {
       nextSteps.push(
         `5. ${chalk.yellow("Important:")} Review your GitHub Actions workflow in ${chalk.cyan(

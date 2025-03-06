@@ -1,5 +1,5 @@
 /// <reference path="./.sst/platform/config.d.ts" />
-import Nuxt from "./.nuxflare/utils/nuxt";
+import Nuxt from "./nuxflare/nuxt";
 
 const prodDomain = "__PROD_DOMAIN__";
 const devDomain = "__DEV_DOMAIN__";
