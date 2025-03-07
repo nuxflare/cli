@@ -1,3 +1,5 @@
+![Nuxflare Logo](https://nuxflare.com/pwa-192x192.png)
+
 # Nuxflare
 
 The fastest, open-source way to deploy your Nuxt applications to Cloudflare.
