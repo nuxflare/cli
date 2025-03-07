@@ -1,20 +1,35 @@
 # Nuxflare
 
 The fastest, open-source way to deploy your Nuxt applications to Cloudflare.
-Nuxflare simplifies deployment with a single CLI command and requires only a Cloudflare API token - no additional accounts or complex setup needed.
+Nuxflare streamlines deployment with a single CLI command and requires only a Cloudflare API token — no additional accounts or complex setup needed.
 
 ## Overview
 
-Nuxflare automatically deploys resources according to your [NuxtHub](https://hub.nuxt.com) configuration, enabling seamless integration with `@nuxt-hub/core`.
+Nuxflare is a deployment tool that automatically provisions and configures Cloudflare resources according to your [NuxtHub](https://hub.nuxt.com) configuration. This enables you to:
 
-> NuxtHub is a platform for managing and deploying full-stack Nuxt applications globally using Cloudflare’s infrastructure.
+- Deploy full-stack Nuxt applications to Cloudflare's global network
+- Integrate seamlessly with the `@nuxt-hub/core` module
+- Manage all your Cloudflare resources through a simple configuration
+
+### How Nuxflare Works with NuxtHub
+
+**What is NuxtHub?**  
+NuxtHub is a platform for managing and deploying full-stack Nuxt applications globally using Cloudflare's infrastructure.
+
+**Important:** Nuxflare operates completely independently from the NuxtHub platform:
+
+- No NuxtHub account required
+- No NuxtHub subscription needed
+- Only a Cloudflare API token is necessary
+
+Nuxflare simply follows the NuxtHub configuration format to deploy your resources directly to your own Cloudflare account.
 
 ### Key Features
 
-- Single-command deployment using Infrastructure as Code (powered by [SST](https://sst.dev))
-- CI/CD friendly - easy integration with your existing pipelines
-- Requires only a Cloudflare API token
-- Automatic resource provisioning for NuxtHub services:
+- **Simplified Deployment**: Single-command deployment using Infrastructure as Code (powered by [SST](https://sst.dev))
+- **CI/CD Integration**: Easily incorporate into your existing pipelines
+- **Minimal Requirements**: Only needs a Cloudflare API token
+- **Automatic Resource Provisioning**: Handles all NuxtHub services:
   - AI
   - Blob Storage
   - Database
@@ -26,7 +41,7 @@ Nuxflare automatically deploys resources according to your [NuxtHub](https://hub
 
 ### 1. Clone a Template
 
-Start by cloning a NuxtHub template that demonstrates the full capabilities of Nuxflare:
+Start with a NuxtHub template that showcases the full capabilities of Nuxflare:
 
 ```bash
 git clone https://github.com/RihanArfan/chat-with-pdf.git
@@ -34,60 +49,126 @@ git clone https://github.com/RihanArfan/chat-with-pdf.git
 
 ### 2. Initialize Nuxflare
 
-Initialize your project using the Nuxflare CLI:
+Set up your project using the Nuxflare CLI:
 
 ```bash
 npx nuxflare init
 ```
 
-During initialization:
+During initialization, you'll be guided through a simple setup process where you'll:
 
-- Choose your project name
-- Select your preferred package manager
-- Nuxflare will create a `sst.config.ts` file for deploying resources
+- **Name your project**: Choose a unique identifier for your deployment
+- **Select package manager**: Pick your preferred tool (npm, yarn, pnpm, or bun)
+- **Set up production and development domains**: Configure custom domains or use free Cloudflare Workers subdomains
+- **Create API credentials**: Generate a Cloudflare API token with the necessary permissions
 
-### 3. Set Up Cloudflare Credentials
+After initialization, Nuxflare automatically:
 
-1. Create a Cloudflare API token with the required permissions using [this link](https://dash.cloudflare.com/profile/api-tokens?permissionGroupKeys=%5B%7B%22key%22:%22ai%22,%22type%22:%22edit%22%7D,%7B%22key%22:%22vectorize%22,%22type%22:%22edit%22%7D,%7B%22key%22:%22d1%22,%22type%22:%22edit%22%7D,%7B%22key%22:%22workers_r2%22,%22type%22:%22edit%22%7D,%7B%22key%22:%22workers_kv_storage%22,%22type%22:%22edit%22%7D,%7B%22key%22:%22workers_scripts%22,%22type%22:%22edit%22%7D,%7B%22key%22:%22memberships%22,%22type%22:%22read%22%7D,%7B%22key%22:%22user_details%22,%22type%22:%22read%22%7D%5D&name=Nuxflare)
+- Creates a `sst.config.ts` file that defines your infrastructure as code
+- Sets up a `nuxflare` directory containing utility files and configurations
 
-![Cloudflare API Token Screenshot](./cloudflare-api-token.jpg)
+These configuration files should be committed to your repository. You can further customize the `sst.config.ts` file to extend your deployment, such as adding more Cloudflare resources or configuring Durable Objects.
 
-2. Set the token in your environment
+### 3. Configure Environment Variables
 
-### 4. Configure Environment Variables
-
-To copy your local environment variables to your deployment stage:
+Transfer your local environment variables to your deployment stage:
 
 ```bash
 npx nuxflare copy-env --stage dev
+# or for production
+npx nuxflare copy-env --production
 ```
 
-This command will:
+This will:
 
-1. Read your local `.env` file
-2. Show a preview of the variables to be copied
-3. Set the environment variables for your specified stage
+1. Read variables from your local `.env` file
+2. Preview the variables to be transferred
+3. Configure the environment for your specified stage
 
-### 5. Deploy Your Application
+### 4. Deploy Your Application
 
-Deploy to your chosen environment:
+Deploy to your desired environment:
 
 ```bash
 npx nuxflare deploy --stage dev
+# or for production
+npx nuxflare deploy --production
 ```
 
-You can use any stage name and deploy multiple instances to a single account using different stage names.
+You can use custom stage names to deploy multiple instances to a single account.
 
-### 6. Local Development
+### 5. Local Development
 
-To connect to a deployed remote environment during development:
+Connect to your deployed remote environment during development:
 
 ```bash
 npx nuxflare dev --stage dev
+# or for production
+npx nuxflare dev --production
 ```
 
-This command starts the Nuxt development server and connects to the specified remote using `NUXT_HUB_PROJECT_URL` and `NUXT_HUB_PROJECT_SECRET_KEY`.
+This launches the Nuxt development server and connects to your specified remote using `NUXT_HUB_PROJECT_URL` and `NUXT_HUB_PROJECT_SECRET_KEY`, giving you access to remote resources (D1, Blob, KV, AI, Cache) and allowing you to run Nitro tasks remotely.
 
-full config process similar to nuxthub, better ui. link to create token.
-better explanations and user friendly.
-better updates
+### 6. Access Your Application
+
+Open your project URL in the browser:
+
+```bash
+npx nuxflare open --stage dev
+# or for production
+npx nuxflare open --production
+```
+
+### 7. Monitor Real-Time Logs
+
+View real-time logs from your deployment:
+
+```bash
+npx nuxflare logs --stage dev
+# or for production
+npx nuxflare logs --production
+```
+
+### 8. Clean Up Resources
+
+Remove all provisioned resources when needed:
+
+```bash
+npx nuxflare remove --stage dev
+# or for production
+npx nuxflare remove --production
+```
+
+This will clean up all resources (D1, KV, Vectorize, Blob, AI, Workers) associated with the specified stage.
+
+### 9. GitHub Actions
+
+Set up automated deployments for your Nuxflare project:
+
+```bash
+# GitHub Actions is configured during initialization
+# You can choose from different deployment strategies
+npx nuxflare init
+```
+
+During the init process, you can select from these options:
+
+- **Manual deployments only**: Trigger deployments via workflow_dispatch
+- **Production deployments only**: Auto-deploy when pushing to the main branch
+- **Full setup**: Both production deployments and preview deployments for PRs
+
+After setup:
+
+1. Add your Cloudflare API token as a GitHub repository secret:
+
+   - Go to your repository → Settings → Secrets and variables → Actions
+   - Create a new repository secret named `CLOUDFLARE_API_TOKEN`
+
+2. Customize your workflow in `.github/workflows/nuxflare-deploy.yml`
+
+3. Trigger deployments:
+   - **Automatic**: Push to main branch (if configured)
+   - **Manual**: Go to Actions → Nuxflare Deploy → Run workflow
+   - **Pull Request**: Automatically creates preview deployments (if configured)
+
+Each deployment creates a unique stage environment based on branch names or custom inputs, making it easy to test changes before production.
