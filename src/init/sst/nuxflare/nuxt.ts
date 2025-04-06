@@ -160,7 +160,7 @@ export async function Nuxt(
     domain,
     extraVars = {},
     transformWrangler,
-    packageManager = "pnpm",
+    packageManager,
     database,
     compatibilityDate,
     outputDir,
@@ -177,8 +177,8 @@ export async function Nuxt(
     outputDir?: string;
   },
 ) {
-  const packageManagerX =
-    PACKAGE_MANAGER_COMMANDS[packageManager || (await getPackageManager())];
+  const pack = packageManager || (await getPackageManager());
+  const packageManagerX = PACKAGE_MANAGER_COMMANDS[pack];
   const projectPath = path.resolve(dir);
   // we use relative path for places where pulumi stores the path
   // this is to ensure we don't let pulumi store device specific paths
@@ -294,7 +294,7 @@ export async function Nuxt(
     const build = builder(name, {
       dir: projectPath,
       env: { ...extraVars },
-      packageManager,
+      packageManager: pack,
     });
 
     const deploy = new command.local.Command(
