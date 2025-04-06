@@ -4,7 +4,7 @@ import { pathExists, readJson } from "./fs.js";
 export async function getPackageManager(): Promise<string> {
   try {
     // Try to read from the config.json file
-    const configPath = path.join(".nuxflare", "state", "config.json");
+    const configPath = path.join("nuxflare", "config.json");
     if (await pathExists(configPath)) {
       const config = await readJson(configPath);
       if (config.packageManager) {

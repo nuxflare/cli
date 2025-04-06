@@ -2,6 +2,7 @@ import { writeFileSync, mkdirSync, existsSync } from "node:fs";
 import * as path from "node:path";
 import { loadNuxtConfig } from "nuxt/kit";
 import { builder } from "./builder";
+import { PACKAGE_MANAGER_COMMANDS, getPackageManager } from "./package-manager";
 
 const DEFAULT_CLOUDFLARE_COMPATIBILITY_DATE = "2024-12-05";
 const BINDINGS = {
@@ -11,13 +12,6 @@ const BINDINGS = {
   KV: "KV",
   CACHE: "CACHE",
   BLOB: "BLOB",
-} as const;
-
-const PACKAGE_MANAGER_COMMANDS = {
-  pnpm: "pnpm exec",
-  yarn: "yarn exec",
-  npm: "npx",
-  bun: "bun x",
 } as const;
 
 type DatabaseConfig = { id: string; name: string } | sst.cloudflare.D1;
@@ -169,6 +163,7 @@ async function Nuxt(
     packageManager = "pnpm",
     database,
     compatibilityDate,
+    outputDir,
   }: {
     dir: string;
     domain?: string;
@@ -179,9 +174,11 @@ async function Nuxt(
     packageManager?: keyof typeof PACKAGE_MANAGER_COMMANDS;
     database?: DatabaseConfig;
     compatibilityDate?: string;
+    outputDir?: string;
   },
 ) {
-  const packageManagerX = PACKAGE_MANAGER_COMMANDS[packageManager];
+  const packageManagerX =
+    PACKAGE_MANAGER_COMMANDS[packageManager || (await getPackageManager())];
   const projectPath = path.resolve(dir);
   // we use relative path for places where pulumi stores the path
   // this is to ensure we don't let pulumi store device specific paths
@@ -193,7 +190,7 @@ async function Nuxt(
   const nuxtConfig = await loadNuxtConfig({ cwd: projectPath });
   const hubConfig = nuxtConfig.hub || {};
   const nuxtHubSecret = new random.RandomUuid(`${name}NuxtHubSecret`);
-  const buildOutputPath = path.resolve(projectPath, "dist");
+  const buildOutputPath = path.resolve(projectPath, outputDir || "dist");
   const migrationsPath = path.resolve(
     buildOutputPath,
     "database",

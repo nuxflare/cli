@@ -27,7 +27,6 @@ export default $config({
     Nuxt("App", {
       dir: ".",
       domain,
-      packageManager: "__PACKAGE_MANAGER__",
     });
   },
 });

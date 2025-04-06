@@ -164,10 +164,10 @@ export async function init() {
           await writeFile(sstConfigPath, sstConfig);
 
           // Save the package manager to config.json
-          const stateDir = path.join(targetDir, ".nuxflare", "state");
-          await ensureDir(stateDir);
+          const nuxflareDir = path.join(targetDir, "nuxflare");
+          await ensureDir(nuxflareDir);
           await writeJson(
-            path.join(stateDir, "config.json"),
+            path.join(nuxflareDir, "config.json"),
             {
               packageManager: results.packageManager,
             },
