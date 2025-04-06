@@ -26,9 +26,7 @@ interface WorkerResult {
   urn: any;
 }
 
-export default async function Worker(
-  options: WorkerOptions,
-): Promise<WorkerResult> {
+export async function Worker(options: WorkerOptions): Promise<WorkerResult> {
   const packageManagerX =
     PACKAGE_MANAGER_COMMANDS[
       options.packageManager || (await getPackageManager())

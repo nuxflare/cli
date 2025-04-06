@@ -153,7 +153,7 @@ class WranglerConfigBuilder {
  * @param options.database - Optional database configuration (existing or SST database)
  * @returns Promise that resolves when deployment is configured
  */
-async function Nuxt(
+export async function Nuxt(
   name: string,
   {
     dir,
@@ -400,5 +400,3 @@ async function Nuxt(
     }
   });
 }
-
-export default Nuxt;

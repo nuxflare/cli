@@ -16,7 +16,7 @@ export default $config({
     };
   },
   async run() {
-    const Nuxt = await import("./nuxflare/nuxt");
+    const { Nuxt } = await import("./nuxflare/nuxt");
 
     const domain =
       $app.stage === "production"
