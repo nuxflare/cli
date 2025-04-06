@@ -1,6 +1,4 @@
 /// <reference path="./.sst/platform/config.d.ts" />
-import Nuxt from "./nuxflare/nuxt";
-
 const prodDomain = "__PROD_DOMAIN__";
 const devDomain = "__DEV_DOMAIN__";
 
@@ -18,6 +16,8 @@ export default $config({
     };
   },
   async run() {
+    const Nuxt = await import("./nuxflare/nuxt");
+
     const domain =
       $app.stage === "production"
         ? prodDomain || undefined
