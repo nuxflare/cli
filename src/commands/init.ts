@@ -9,6 +9,7 @@ import { Liquid } from "liquidjs";
 import { rootPath } from "../utils/dirname.js";
 import { pathExists, ensureDir, writeJson, copy } from "../utils/fs.js";
 import { getCloudflareToken } from "../utils/cloudflare-token.js";
+import { getExecutableCommand } from "../utils/package-manager.js";
 
 // Helper function to run commands
 function runCommand(command: string): Promise<void> {
@@ -233,7 +234,7 @@ export async function init() {
       {
         title: "Initializing SST.dev",
         task: async () => {
-          await runCommand(`${results.packageManager} sst install`);
+          await runCommand(`${getExecutableCommand(results.packageManager)} sst install`);
           return "Initialized SST.dev successfully";
         },
       },

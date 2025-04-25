@@ -56,7 +56,7 @@ class WranglerConfigBuilder {
       this.config.d1_databases.push({
         binding: BINDINGS.DATABASE,
         database_name: database.nodes.database.name,
-        database_id: database.id,
+        database_id: database.nodes.database.id,
         migrations_dir: migrationsDir,
       });
     } else {
@@ -387,11 +387,10 @@ export async function Nuxt(
           `${name}Migrations`,
           {
             dir: projectPathRelative,
-            create: `${
-              existsSync(migrationsPath)
-                ? `${packageManagerX} wrangler --config ${wranglerConfigPath} d1 migrations apply ${name} --remote`
-                : 'echo "Migrations directory not found, skipping."'
-            }`,
+            create: `${existsSync(migrationsPath)
+              ? `${packageManagerX} wrangler --config ${wranglerConfigPath} d1 migrations apply ${name} --remote`
+              : 'echo "Migrations directory not found, skipping."'
+              }`,
             triggers: [new Date().toString()],
           },
           { dependsOn: [deploy] },
